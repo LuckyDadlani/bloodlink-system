@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BloodLink AI Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <section id="login-view" class="card login-card">
+        <p class="eyebrow" align="center">BloodLink AI</p>
+        <h2 align="center">Blood Bank Control Deck</h2>
+        <form id="login-form" class="form-grid">
+          <label>
+            <span>Email</span>
+            <input id="email" name="email" type="email" required placeholder="bloodbank@..." />
+          </label>
+          <label>
+            <span>Password</span>
+            <input id="password" name="password" type="password" required placeholder="Enter password" />
+          </label>
+          <button type="submit" class="btn btn-primary">Log In</button>
+        </form>
+        <p id="login-error" class="error-text" hidden></p>
+      </section>
+
+      <section id="dashboard-view" hidden>
+        <header class="topbar card">
+          <div>
+            <p class="eyebrow">Welcome</p>
+            <h2 id="bank-name">-</h2>
+            <p id="bank-location" class="subtitle">-</p>
+          </div>
+          <div class="actions-row">
+            <select id="hospital-selector"></select>
+            <button id="refresh-btn" class="btn btn-ghost">Refresh</button>
+            <button id="logout-btn" class="btn btn-danger">Logout</button>
+          </div>
+        </header>
+
+        <section class="stats-grid" id="stats-grid">
+          <article class="card stat-card">
+            <p>Total Inventory Units</p>
+            <h3 id="stat-total-units">0</h3>
+          </article>
+          <article class="card stat-card">
+            <p>Active Requests</p>
+            <h3 id="stat-active">0</h3>
+          </article>
+          <article class="card stat-card">
+            <p>Fulfilled Requests</p>
+            <h3 id="stat-fulfilled">0</h3>
+          </article>
+        </section>
+
+        <section class="content-grid">
+          <article class="card">
+            <div class="section-head">
+              <h3>Inventory Management</h3>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Blood Group</th>
+                    <th>Component</th>
+                    <th>Units</th>
+                    <th>Last Updated</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="inventory-body"></tbody>
+              </table>
+            </div>
+          </article>
+
+          <article class="card">
+            <div class="section-head">
+              <h3>Create Emergency Request</h3>
+            </div>
+            <form id="request-form" class="form-grid compact">
+              <label>
+                <span>Blood Group</span>
+                <select id="blood-group" required>
+                  <option>A+</option><option>A-</option><option>B+</option><option>B-</option>
+                  <option>O+</option><option>O-</option><option>AB+</option><option>AB-</option>
+                </select>
+              </label>
+              <label>
+                <span>Component</span>
+                <select id="component" required>
+                  <option>Whole Blood</option>
+                  <option>Packed Red Cells</option>
+                  <option>Platelets</option>
+                  <option>Fresh Frozen Plasma</option>
+                  <option>Cryoprecipitate</option>
+                </select>
+              </label>
+              <label>
+                <span>Units Required</span>
+                <input id="units-required" type="number" min="1" value="1" required />
+              </label>
+              <label>
+                <span>Urgency</span>
+                <select id="urgency">
+                  <option>HIGH</option>
+                  <option>CRITICAL</option>
+                </select>
+              </label>
+              <button type="submit" class="btn btn-primary">Create Request</button>
+            </form>
+            <p id="request-status" class="ok-text" hidden></p>
+          </article>
+        </section>
+
+        <section class="content-grid single-col">
+          <article class="card">
+            <div class="section-head">
+              <h3>Recent Emergency Requests</h3>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Emergency ID</th>
+                    <th>Group</th>
+                    <th>Units</th>
+                    <th>Status</th>
+                    <th>Created At</th>
+                  </tr>
+                </thead>
+                <tbody id="request-body"></tbody>
+              </table>
+            </div>
+          </article>
+        </section>
+      </section>
+    </main>
+
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>
