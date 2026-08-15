@@ -25,6 +25,8 @@ public class RequestService {
     private final HospitalProfileRepository hospitalProfileRepository;
     private final DonorNotificationRepository donorNotificationRepository;
     private final EligibleDonorViewRepository eligibleDonorViewRepository;
+    private final BloodInventoryRepository bloodInventoryRepository;
+    private final BankRequestDismissalRepository bankRequestDismissalRepository;
     private final MlServiceClient mlServiceClient;
     private final TelegramService telegramService;
     private final int topN;
@@ -33,6 +35,8 @@ public class RequestService {
                           HospitalProfileRepository hospitalProfileRepository,
                           DonorNotificationRepository donorNotificationRepository,
                           EligibleDonorViewRepository eligibleDonorViewRepository,
+                          BloodInventoryRepository bloodInventoryRepository,
+                          BankRequestDismissalRepository bankRequestDismissalRepository,
                           MlServiceClient mlServiceClient,
                           TelegramService telegramService,
                           @org.springframework.beans.factory.annotation.Value("${bloodlink.ml.top-n}") int topN) {
@@ -40,6 +44,8 @@ public class RequestService {
         this.hospitalProfileRepository = hospitalProfileRepository;
         this.donorNotificationRepository = donorNotificationRepository;
         this.eligibleDonorViewRepository = eligibleDonorViewRepository;
+        this.bloodInventoryRepository = bloodInventoryRepository;
+        this.bankRequestDismissalRepository = bankRequestDismissalRepository;
         this.mlServiceClient = mlServiceClient;
         this.telegramService = telegramService;
         this.topN = topN;
@@ -150,6 +156,54 @@ public class RequestService {
             request.donorId(),
             acceptedAt
         );
+    }
+
+    @Transactional(readOnly = true)
+    public List<EmergencyRequest> getRequestsForBank(UUID bloodBankId) {
+        return emergencyRequestRepository.findIncomingRequestsForBank(bloodBankId);
+    }
+
+    @Transactional
+    public void fulfillRequest(UUID emergencyId, UUID bloodBankId, int unitsFulfilled) {
+        EmergencyRequest request = emergencyRequestRepository.findById(emergencyId)
+            .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Request not found"));
+
+        if (!List.of("CREATED", "CHECKING_BANKS", "ESCALATED_TO_DONORS", "DONORS_NOTIFIED").contains(request.getStatus())) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Request cannot be fulfilled in its current status");
+        }
+
+        // Validate units available in inventory
+        BloodInventory inventory = bloodInventoryRepository.findByBankAndGroupAndComponent(
+                bloodBankId, request.getBloodGroupRequired(), request.getComponentRequired())
+            .orElseThrow(() -> new ApiException(HttpStatus.BAD_REQUEST, "Blood bank does not carry the required blood group and component"));
+
+        if (inventory.getUnitsAvailable() < unitsFulfilled) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Not enough units in stock to fulfill this request");
+        }
+
+        // Decrement inventory
+        inventory.setUnitsAvailable(inventory.getUnitsAvailable() - unitsFulfilled);
+        inventory.setLastUpdatedAt(Instant.now());
+        bloodInventoryRepository.save(inventory);
+
+        // Update request
+        request.setStatus("FULFILLED_BY_BANK");
+        request.setFulfilledByBankId(bloodBankId);
+        request.setUnitsFulfilled(unitsFulfilled);
+        request.setClosedAt(Instant.now());
+        emergencyRequestRepository.save(request);
+    }
+
+    @Transactional
+    public void dismissRequest(UUID emergencyId, UUID bloodBankId) {
+        if (!bankRequestDismissalRepository.existsByBloodBankIdAndEmergencyId(bloodBankId, emergencyId)) {
+            BankRequestDismissal dismissal = new BankRequestDismissal();
+            dismissal.setDismissalId(UUID.randomUUID());
+            dismissal.setBloodBankId(bloodBankId);
+            dismissal.setEmergencyId(emergencyId);
+            dismissal.setDismissedAt(Instant.now());
+            bankRequestDismissalRepository.save(dismissal);
+        }
     }
 
     private List<RankedDonorDto> rankDonorsWithFallback(UUID emergencyId, String bloodGroup) {

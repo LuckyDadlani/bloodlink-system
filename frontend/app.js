@@ -18,6 +18,9 @@ const statActive = document.getElementById("stat-active");
 const statFulfilled = document.getElementById("stat-fulfilled");
 
 const inventoryBody = document.getElementById("inventory-body");
+const inventoryForm = document.getElementById("inventory-form");
+const inventoryStatus = document.getElementById("inventory-status");
+const incomingRequestBody = document.getElementById("incoming-request-body");
 const requestBody = document.getElementById("request-body");
 const requestForm = document.getElementById("request-form");
 const requestStatus = document.getElementById("request-status");
@@ -29,6 +32,7 @@ init();
 
 function init() {
   loginForm.addEventListener("submit", onLogin);
+  inventoryForm.addEventListener("submit", onAddInventory);
   requestForm.addEventListener("submit", onCreateRequest);
   refreshBtn.addEventListener("click", () => loadDashboardData(true));
   logoutBtn.addEventListener("click", onLogout);
@@ -127,6 +131,7 @@ async function loadDashboardData(showStatus) {
     );
     const inventory = await api(`/inventory/${session.bloodBankId}`, { headers: authHeaders() });
     const requests = await api(`/requests?creatorHospitalId=${session.creatorHospitalId}`, { headers: authHeaders() });
+    const incomingRequests = await api(`/requests/bank/${session.bloodBankId}`, { headers: authHeaders() });
 
     statTotalUnits.textContent = dashboard.totalUnits;
     statActive.textContent = dashboard.activeRequests;
@@ -134,6 +139,7 @@ async function loadDashboardData(showStatus) {
 
     renderInventory(inventory);
     renderRequests(requests);
+    renderIncomingRequests(incomingRequests);
 
     if (showStatus) {
       requestStatus.hidden = false;
@@ -160,10 +166,13 @@ function renderInventory(items) {
       <td>${item.componentType}</td>
       <td>${item.unitsAvailable}</td>
       <td>${formatDate(item.lastUpdatedAt)}</td>
-      <td><button class="btn btn-ghost" data-id="${item.inventoryId}" data-units="${item.unitsAvailable}">Edit</button></td>
+      <td>
+        <button class="btn btn-ghost edit-btn" data-id="${item.inventoryId}" data-units="${item.unitsAvailable}">Edit</button>
+        <button class="btn btn-danger delete-btn" data-id="${item.inventoryId}">Delete</button>
+      </td>
     `;
 
-    row.querySelector("button").addEventListener("click", async (event) => {
+    row.querySelector(".edit-btn").addEventListener("click", async (event) => {
       const button = event.currentTarget;
       const currentUnits = Number(button.dataset.units);
       const value = prompt("Enter new units available:", String(currentUnits));
@@ -189,7 +198,57 @@ function renderInventory(items) {
       await loadDashboardData(true);
     });
 
+    row.querySelector(".delete-btn").addEventListener("click", async (event) => {
+      const button = event.currentTarget;
+      if (!confirm("Are you sure you want to delete this inventory row?")) {
+        return;
+      }
+      try {
+        await api(`/inventory/${button.dataset.id}`, {
+          method: "DELETE",
+          headers: { ...authHeaders(), "X-Blood-Bank-Id": session.bloodBankId }
+        });
+        await loadDashboardData(true);
+      } catch (error) {
+        alert("Failed to delete: " + error.message);
+      }
+    });
+
     inventoryBody.appendChild(row);
+  }
+}
+
+async function onAddInventory(event) {
+  event.preventDefault();
+
+  const payload = {
+    bloodBankId: session.bloodBankId,
+    bloodGroup: document.getElementById("inv-blood-group").value,
+    componentType: document.getElementById("inv-component").value,
+    unitsAvailable: Number(document.getElementById("inv-units").value),
+    createdBy: session.userId
+  };
+
+  try {
+    await api("/inventory", {
+      method: "POST",
+      headers: authHeaders(),
+      body: JSON.stringify(payload)
+    });
+
+    inventoryStatus.hidden = false;
+    inventoryStatus.classList.remove("error-text");
+    inventoryStatus.classList.add("ok-text");
+    inventoryStatus.textContent = "Inventory row added successfully.";
+    
+    document.getElementById("inv-units").value = "0";
+
+    await loadDashboardData(true);
+  } catch (error) {
+    inventoryStatus.hidden = false;
+    inventoryStatus.classList.add("error-text");
+    inventoryStatus.classList.remove("ok-text");
+    inventoryStatus.textContent = `Failed to add inventory: ${error.message}`;
   }
 }
 
@@ -206,6 +265,67 @@ function renderRequests(items) {
       <td>${formatDate(req.createdAt)}</td>
     `;
     requestBody.appendChild(row);
+  }
+}
+
+function renderIncomingRequests(items) {
+  incomingRequestBody.innerHTML = "";
+
+  for (const req of items) {
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td>${req.emergencyId.substring(0, 8)}...</td>
+      <td>${req.bloodGroupRequired}</td>
+      <td>${req.componentRequired}</td>
+      <td>${req.unitsRequired}</td>
+      <td>${req.urgencyLevel}</td>
+      <td>${req.hospitalCity}</td>
+      <td>${req.status}</td>
+      <td>${formatDate(req.createdAt)}</td>
+      <td>
+        <button class="btn btn-primary fulfill-btn" data-id="${req.emergencyId}" data-units="${req.unitsRequired}">Fulfill</button>
+        <button class="btn btn-ghost dismiss-btn" data-id="${req.emergencyId}">Dismiss</button>
+      </td>
+    `;
+
+    row.querySelector(".fulfill-btn").addEventListener("click", async (event) => {
+      const button = event.currentTarget;
+      const requestedUnits = Number(button.dataset.units);
+      const value = prompt(`Enter units to fulfill (max ${requestedUnits}):`, String(requestedUnits));
+      if (!value) return;
+
+      const units = Number(value);
+      if (Number.isNaN(units) || units <= 0 || units > requestedUnits) {
+        alert("Invalid units amount.");
+        return;
+      }
+
+      try {
+        await api(`/requests/${button.dataset.id}/fulfill`, {
+          method: "POST",
+          headers: { ...authHeaders(), "X-Blood-Bank-Id": session.bloodBankId },
+          body: JSON.stringify({ unitsFulfilled: units })
+        });
+        await loadDashboardData(true);
+      } catch (error) {
+        alert("Failed to fulfill: " + error.message);
+      }
+    });
+
+    row.querySelector(".dismiss-btn").addEventListener("click", async (event) => {
+      const button = event.currentTarget;
+      try {
+        await api(`/requests/${button.dataset.id}/dismiss`, {
+          method: "POST",
+          headers: { ...authHeaders(), "X-Blood-Bank-Id": session.bloodBankId }
+        });
+        await loadDashboardData(true);
+      } catch (error) {
+        alert("Failed to dismiss: " + error.message);
+      }
+    });
+
+    incomingRequestBody.appendChild(row);
   }
 }
 

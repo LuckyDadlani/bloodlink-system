@@ -6,6 +6,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.time.Instant;
 import java.util.UUID;
+import org.hibernate.annotations.ColumnTransformer;
 
 @Entity
 @Table(name = "blood_inventory")
@@ -18,10 +19,12 @@ public class BloodInventory {
     @Column(name = "blood_bank_id")
     private UUID bloodBankId;
 
-    @Column(name = "blood_group")
+    @Column(name = "blood_group", columnDefinition = "blood_group_enum")
+    @ColumnTransformer(write = "?::blood_group_enum")
     private String bloodGroup;
 
-    @Column(name = "component_type")
+    @Column(name = "component_type", columnDefinition = "component_type_enum")
+    @ColumnTransformer(write = "?::component_type_enum")
     private String componentType;
 
     @Column(name = "units_available")

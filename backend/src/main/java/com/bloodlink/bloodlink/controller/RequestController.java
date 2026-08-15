@@ -55,4 +55,30 @@ public class RequestController {
         telegramService.sendMessage(request.chatId(), request.message());
         return Map.of("status", "SENT");
     }
+
+    @GetMapping("/bank/{bloodBankId}")
+    public List<EmergencyRequest> fetchIncomingRequestsForBank(@PathVariable UUID bloodBankId,
+                                                               @RequestHeader("X-User-Id") UUID userId) {
+        accessService.requireBloodBankUser(userId);
+        return service.getRequestsForBank(bloodBankId);
+    }
+
+    @PostMapping("/{emergencyId}/fulfill")
+    public Map<String, String> fulfillRequest(@PathVariable UUID emergencyId,
+                                              @Valid @RequestBody com.bloodlink.bloodlink.dto.FulfillRequestDto request,
+                                              @RequestHeader("X-User-Id") UUID userId,
+                                              @RequestHeader("X-Blood-Bank-Id") UUID bloodBankId) {
+        accessService.requireBloodBankUser(userId);
+        service.fulfillRequest(emergencyId, bloodBankId, request.unitsFulfilled());
+        return Map.of("status", "FULFILLED");
+    }
+
+    @PostMapping("/{emergencyId}/dismiss")
+    public Map<String, String> dismissRequest(@PathVariable UUID emergencyId,
+                                              @RequestHeader("X-User-Id") UUID userId,
+                                              @RequestHeader("X-Blood-Bank-Id") UUID bloodBankId) {
+        accessService.requireBloodBankUser(userId);
+        service.dismissRequest(emergencyId, bloodBankId);
+        return Map.of("status", "DISMISSED");
+    }
 }

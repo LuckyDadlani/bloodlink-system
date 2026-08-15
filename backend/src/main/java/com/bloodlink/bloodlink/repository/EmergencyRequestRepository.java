@@ -44,4 +44,22 @@ public interface EmergencyRequestRepository extends JpaRepository<EmergencyReque
 		int markFulfilledByFirstDonor(@Param("emergencyId") UUID emergencyId,
 																	@Param("donorId") UUID donorId,
 																	@Param("respondedAt") Instant respondedAt);
+
+		@Query(value = """
+				SELECT er.* FROM emergency_requests er
+				WHERE er.status IN ('CREATED', 'CHECKING_BANKS', 'ESCALATED_TO_DONORS', 'DONORS_NOTIFIED')
+					AND EXISTS (
+							SELECT 1 FROM blood_inventory bi
+							WHERE bi.blood_bank_id = :bloodBankId
+								AND bi.blood_group = er.blood_group_required
+								AND bi.component_type = er.component_required
+					)
+					AND NOT EXISTS (
+							SELECT 1 FROM blood_bank_request_dismissals brd
+							WHERE brd.emergency_id = er.emergency_id
+								AND brd.blood_bank_id = :bloodBankId
+					)
+				ORDER BY er.created_at DESC
+				""", nativeQuery = true)
+		List<EmergencyRequest> findIncomingRequestsForBank(@Param("bloodBankId") UUID bloodBankId);
 }
