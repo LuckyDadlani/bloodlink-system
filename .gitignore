@@ -18,3 +18,9 @@ __pycache__/
 # IDE
 .idea/
 .vscode/
+
+# Research Paper / LaTeX
+major project paper/
+research-paper/
+*.tex
+*.bib
