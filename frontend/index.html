@@ -3,160 +3,298 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>BloodLink AI Dashboard</title>
+    <title>BloodLink | Secure Clinical Access Portal</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
-    <main class="app-shell">
-      <section id="login-view" class="card login-card">
-        <p class="eyebrow" align="center">BloodLink AI</p>
-        <h2 align="center">Blood Bank Control Deck</h2>
-        <form id="login-form" class="form-grid">
-          <label>
-            <span>Email</span>
-            <input id="email" name="email" type="email" required placeholder="bloodbank@..." />
-          </label>
-          <label>
-            <span>Password</span>
-            <input id="password" name="password" type="password" required placeholder="Enter password" />
-          </label>
-          <button type="submit" class="btn btn-primary">Log In</button>
-        </form>
-        <p id="login-error" class="error-text" hidden></p>
-      </section>
+    <!-- ============ LOGIN VIEW ============ -->
+    <main id="login-view" class="auth-screen">
+      <div class="auth-card">
+        <div class="auth-logo">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M12 2C12 2 5 11.5 5 15.5C5 19.6 8.4 23 12 23C15.6 23 19 19.6 19 15.5C19 11.5 12 2 12 2Z"
+              fill="currentColor"
+            />
+            <path
+              d="M9.5 15.5C9.5 16.5 10.2 17.5 12 17.5"
+              stroke="#fff"
+              stroke-width="1.4"
+              stroke-linecap="round"
+            />
+          </svg>
+        </div>
+        <h1>BloodLink</h1>
+        <p class="auth-subtitle">Secure Clinical Access Portal</p>
 
-      <section id="dashboard-view" hidden>
-        <header class="topbar card">
-          <div>
-            <p class="eyebrow">Welcome</p>
-            <h2 id="bank-name">-</h2>
-            <p id="bank-location" class="subtitle">-</p>
+        <form id="login-form" class="auth-form">
+          <label class="field">
+            <span class="field-label">Email Address</span>
+            <span class="input-wrap">
+              <svg
+                class="input-icon"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <rect x="2" y="4" width="20" height="16" rx="2" />
+                <path d="m22 7-10 6L2 7" />
+              </svg>
+              <input
+                id="email"
+                name="email"
+                type="email"
+                required
+                placeholder="dr.smith@centralmedical.org"
+                autocomplete="username"
+              />
+            </span>
+          </label>
+
+          <label class="field">
+            <span class="field-label">Password</span>
+            <span class="input-wrap">
+              <svg
+                class="input-icon"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <rect x="3" y="11" width="18" height="11" rx="2" />
+                <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+              </svg>
+              <input
+                id="password"
+                name="password"
+                type="password"
+                required
+                placeholder="Enter password"
+                autocomplete="current-password"
+              />
+            </span>
+          </label>
+
+          <p id="login-error" class="error-text" hidden></p>
+
+          <div class="auth-row">
+            <label class="checkbox">
+              <input type="checkbox" id="remember-workstation" />
+              <span>Remember workstation</span>
+            </label>
+            <a href="#" class="link-muted">Forgot credentials?</a>
           </div>
-          <div class="actions-row">
+
+          <button type="submit" class="btn btn-primary btn-block">
+            <span id="login-btn-text">Log In to BloodLink</span>
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M5 12h14" />
+              <path d="m12 5 7 7-7 7" />
+            </svg>
+          </button>
+        </form>
+
+        <div class="auth-divider"><span>Authorized Personnel Only</span></div>
+      </div>
+    </main>
+
+    <!-- ============ APP SHELL ============ -->
+    <div id="app-view" class="app-shell" hidden>
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="brand-icon">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M12 2C12 2 5 11.5 5 15.5C5 19.6 8.4 23 12 23C15.6 23 19 19.6 19 15.5C19 11.5 12 2 12 2Z"
+                fill="currentColor"
+              />
+            </svg>
+          </div>
+          <div>
+            <p class="brand-name">BloodLink</p>
+            <p class="brand-sub" id="sidebar-location">-</p>
+          </div>
+        </div>
+
+        <nav class="nav">
+          <button class="nav-item active" data-view="home">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <rect x="3" y="3" width="7" height="7" rx="1" />
+              <rect x="14" y="3" width="7" height="7" rx="1" />
+              <rect x="14" y="14" width="7" height="7" rx="1" />
+              <rect x="3" y="14" width="7" height="7" rx="1" />
+            </svg>
+            <span>Home</span>
+          </button>
+          <button class="nav-item" data-view="requests">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path
+                d="M12 2C12 2 5 11.5 5 15.5C5 19.6 8.4 23 12 23C15.6 23 19 19.6 19 15.5C19 11.5 12 2 12 2Z"
+              />
+            </svg>
+            <span>Blood Requests</span>
+          </button>
+          <button class="nav-item" data-view="inventory">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <rect x="3" y="4" width="18" height="4" rx="1" />
+              <path d="M4 8v11a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1V8" />
+              <path d="M10 12h4" />
+            </svg>
+            <span>Inventory</span>
+          </button>
+          <button class="nav-item" data-view="fulfilled">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M3 12a9 9 0 1 0 3-6.7L3 8" />
+              <path d="M3 3v5h5" />
+              <path d="M12 7v5l3 3" />
+            </svg>
+            <span>Fulfilled Requests</span>
+          </button>
+        </nav>
+
+        <div class="sidebar-footer">
+          <label class="field">
+            <span class="field-label field-label-light">Hospital context</span>
             <select id="hospital-selector"></select>
-            <button id="refresh-btn" class="btn btn-ghost">Refresh</button>
-            <button id="logout-btn" class="btn btn-danger">Logout</button>
+          </label>
+          <button id="logout-btn" class="btn btn-logout btn-block">
+            Logout
+          </button>
+        </div>
+      </aside>
+
+      <div class="main">
+        <header class="topbar">
+          <div>
+            <h1 id="page-title">Home</h1>
+            <p id="page-subtitle" class="muted">Daily Overview</p>
+          </div>
+          <div class="topbar-actions">
+            <button id="refresh-btn" class="icon-btn" title="Refresh data">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M21 12a9 9 0 1 1-2.6-6.4" />
+                <path d="M21 3v6h-6" />
+              </svg>
+            </button>
+            <button class="icon-btn" title="Notifications">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" />
+                <path d="M13.7 21a2 2 0 0 1-3.4 0" />
+              </svg>
+            </button>
+            <div class="avatar" id="user-avatar">?</div>
           </div>
         </header>
 
-        <section class="stats-grid" id="stats-grid">
-          <article class="card stat-card">
-            <p>Total Inventory Units</p>
-            <h3 id="stat-total-units">0</h3>
-          </article>
-          <article class="card stat-card">
-            <p>Active Requests</p>
-            <h3 id="stat-active">0</h3>
-          </article>
-          <article class="card stat-card">
-            <p>Fulfilled Requests</p>
-            <h3 id="stat-fulfilled">0</h3>
-          </article>
-        </section>
+        <p id="global-status" class="status-line" hidden></p>
 
-        <section class="content-grid">
-          <article class="card">
-            <div class="section-head">
-              <h3>Inventory Management</h3>
-            </div>
-            <form id="inventory-form" class="form-grid compact">
-              <label>
-                <span>Blood Group</span>
-                <select id="inv-blood-group" required>
-                  <option value="A+">A+</option><option value="A-">A-</option>
-                  <option value="B+">B+</option><option value="B-">B-</option>
-                  <option value="O+">O+</option><option value="O-">O-</option>
-                  <option value="AB+">AB+</option><option value="AB-">AB-</option>
-                </select>
-              </label>
-              <label>
-                <span>Component</span>
-                <select id="inv-component" required>
-                  <option value="Whole Blood">Whole Blood</option>
-                  <option value="Packed Red Cells">Packed Red Cells</option>
-                  <option value="Platelets">Platelets</option>
-                  <option value="Fresh Frozen Plasma">Fresh Frozen Plasma</option>
-                  <option value="Cryoprecipitate">Cryoprecipitate</option>
-                </select>
-              </label>
-              <label>
-                <span>Units</span>
-                <input id="inv-units" type="number" min="0" value="0" required />
-              </label>
-              <label>
-                <span style="visibility: hidden">Action</span>
-                <button type="submit" class="btn btn-primary">Add Row</button>
-              </label>
-            </form>
-            <p id="inventory-status" class="ok-text" hidden></p>
-            <div class="table-wrap">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Blood Group</th>
-                    <th>Component</th>
-                    <th>Units</th>
-                    <th>Last Updated</th>
-                    <th>Action</th>
-                  </tr>
-                </thead>
-                <tbody id="inventory-body"></tbody>
-              </table>
-            </div>
-          </article>
+        <!-- HOME -->
+        <section class="view" id="view-home">
+          <section class="stats-grid">
+            <article class="card stat-card">
+              <p class="stat-label">Total Inventory Units</p>
+              <h3 id="stat-total-units">0</h3>
+            </article>
+            <article class="card stat-card">
+              <p class="stat-label">Active Requests</p>
+              <h3 id="stat-active" class="stat-accent">0</h3>
+            </article>
+            <article class="card stat-card">
+              <p class="stat-label">Fulfilled Requests</p>
+              <h3 id="stat-fulfilled">0</h3>
+            </article>
+          </section>
 
           <article class="card">
             <div class="section-head">
-              <h3>Create Emergency Request</h3>
-            </div>
-            <form id="request-form" class="form-grid compact">
-              <label>
-                <span>Blood Group</span>
-                <select id="blood-group" required>
-                  <option>A+</option><option>A-</option><option>B+</option><option>B-</option>
-                  <option>O+</option><option>O-</option><option>AB+</option><option>AB-</option>
-                </select>
-              </label>
-              <label>
-                <span>Component</span>
-                <select id="component" required>
-                  <option>Whole Blood</option>
-                  <option>Packed Red Cells</option>
-                  <option>Platelets</option>
-                  <option>Fresh Frozen Plasma</option>
-                  <option>Cryoprecipitate</option>
-                </select>
-              </label>
-              <label>
-                <span>Units Required</span>
-                <input id="units-required" type="number" min="1" value="1" required />
-              </label>
-              <label>
-                <span>Urgency</span>
-                <select id="urgency">
-                  <option>HIGH</option>
-                  <option>CRITICAL</option>
-                </select>
-              </label>
-              <button type="submit" class="btn btn-primary">Create Request</button>
-            </form>
-            <p id="request-status" class="ok-text" hidden></p>
-          </article>
-        </section>
-
-        <section class="content-grid single-col">
-          <article class="card">
-            <div class="section-head">
-              <h3>Incoming Blood Requests</h3>
+              <h3>Incoming Requests</h3>
+              <button class="btn btn-outline btn-sm" id="home-filter-btn">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3Z" />
+                </svg>
+                Filter
+              </button>
             </div>
             <div class="table-wrap">
               <table>
                 <thead>
                   <tr>
-                    <th>Emergency ID</th>
+                    <th>ID</th>
                     <th>Group</th>
                     <th>Component</th>
                     <th>Units</th>
@@ -164,24 +302,219 @@
                     <th>City</th>
                     <th>Status</th>
                     <th>Time</th>
-                    <th>Action</th>
+                    <th>Actions</th>
                   </tr>
                 </thead>
                 <tbody id="incoming-request-body"></tbody>
               </table>
+              <p class="empty-state" id="incoming-empty" hidden>
+                No incoming requests right now.
+              </p>
             </div>
+          </article>
+        </section>
+
+        <!-- INVENTORY -->
+        <section class="view" id="view-inventory" hidden>
+          <article class="card">
+            <div class="section-head"><h3>Add Inventory</h3></div>
+            <form id="inventory-form" class="form-grid compact">
+              <label class="field">
+                <span class="field-label">Blood Group</span>
+                <select id="inv-blood-group" required>
+                  <option value="A+">A+</option>
+                  <option value="A-">A-</option>
+                  <option value="B+">B+</option>
+                  <option value="B-">B-</option>
+                  <option value="O+">O+</option>
+                  <option value="O-">O-</option>
+                  <option value="AB+">AB+</option>
+                  <option value="AB-">AB-</option>
+                </select>
+              </label>
+              <label class="field">
+                <span class="field-label">Component</span>
+                <select id="inv-component" required>
+                  <option value="Whole Blood">Whole Blood</option>
+                  <option value="Packed Red Cells">Packed Red Cells</option>
+                  <option value="Platelets">Platelets</option>
+                  <option value="Fresh Frozen Plasma">
+                    Fresh Frozen Plasma
+                  </option>
+                  <option value="Cryoprecipitate">Cryoprecipitate</option>
+                </select>
+              </label>
+              <label class="field">
+                <span class="field-label">Units</span>
+                <input
+                  id="inv-units"
+                  type="number"
+                  min="0"
+                  value="0"
+                  required
+                />
+              </label>
+              <button type="submit" class="btn btn-primary">Add Stock</button>
+            </form>
+            <p id="inventory-status" class="ok-text" hidden></p>
           </article>
 
           <article class="card">
             <div class="section-head">
-              <h3>Recent Emergency Requests</h3>
+              <h3>Current Stock</h3>
+              <span class="input-wrap input-wrap-sm">
+                <svg
+                  class="input-icon"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <circle cx="11" cy="11" r="8" />
+                  <path d="m21 21-4.3-4.3" />
+                </svg>
+                <input
+                  id="inventory-filter"
+                  type="text"
+                  placeholder="Filter stock..."
+                />
+              </span>
             </div>
             <div class="table-wrap">
               <table>
                 <thead>
                   <tr>
-                    <th>Emergency ID</th>
                     <th>Group</th>
+                    <th>Component</th>
+                    <th>Units</th>
+                    <th>Last Updated</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="inventory-body"></tbody>
+              </table>
+              <p class="empty-state" id="inventory-empty" hidden>
+                No stock recorded yet.
+              </p>
+            </div>
+          </article>
+        </section>
+
+        <!-- BLOOD REQUESTS -->
+        <section class="view" id="view-requests" hidden>
+          <article class="card">
+            <div class="section-head">
+              <h3><span class="asterisk">*</span> Create Emergency Request</h3>
+            </div>
+            <form id="request-form" class="form-grid compact">
+              <label class="field">
+                <span class="field-label">Blood Group</span>
+                <select id="blood-group" required>
+                  <option value="" disabled selected>Select Group</option>
+                  <option>A+</option>
+                  <option>A-</option>
+                  <option>B+</option>
+                  <option>B-</option>
+                  <option>O+</option>
+                  <option>O-</option>
+                  <option>AB+</option>
+                  <option>AB-</option>
+                </select>
+              </label>
+              <label class="field">
+                <span class="field-label">Component</span>
+                <select id="component" required>
+                  <option value="" disabled selected>Select Component</option>
+                  <option>Whole Blood</option>
+                  <option>Packed Red Cells</option>
+                  <option>Platelets</option>
+                  <option>Fresh Frozen Plasma</option>
+                  <option>Cryoprecipitate</option>
+                </select>
+              </label>
+              <label class="field">
+                <span class="field-label">Units Required</span>
+                <input
+                  id="units-required"
+                  type="number"
+                  min="1"
+                  placeholder="e.g., 2"
+                  required
+                />
+              </label>
+              <label class="field">
+                <span class="field-label">Urgency</span>
+                <select id="urgency">
+                  <option value="ROUTINE">Routine (24h)</option>
+                  <option value="HIGH">High</option>
+                  <option value="CRITICAL">Critical</option>
+                </select>
+              </label>
+              <button type="submit" class="btn btn-primary">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="m5 12 14-9-4 9 4 9Z" />
+                </svg>
+                Submit Request
+              </button>
+            </form>
+            <p id="request-status" class="ok-text" hidden></p>
+          </article>
+
+          <article class="card">
+            <div class="section-head">
+              <h3>My Created Requests</h3>
+              <div class="head-actions">
+                <button
+                  class="icon-btn-sm"
+                  id="requests-filter-btn"
+                  title="Filter"
+                >
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3Z" />
+                  </svg>
+                </button>
+                <button
+                  class="icon-btn-sm"
+                  id="requests-refresh-btn"
+                  title="Refresh"
+                >
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M21 12a9 9 0 1 1-2.6-6.4" />
+                    <path d="M21 3v6h-6" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Request ID</th>
+                    <th>Group</th>
+                    <th>Component</th>
                     <th>Units</th>
                     <th>Status</th>
                     <th>Created At</th>
@@ -189,11 +522,130 @@
                 </thead>
                 <tbody id="request-body"></tbody>
               </table>
+              <p class="empty-state" id="requests-empty" hidden>
+                You haven't created any requests yet.
+              </p>
             </div>
           </article>
         </section>
-      </section>
-    </main>
+
+        <!-- FULFILLED REQUESTS -->
+        <section class="view" id="view-fulfilled" hidden>
+          <section class="stats-grid">
+            <article class="card stat-card">
+              <p class="stat-label">Units Distributed (30 days)</p>
+              <h3 id="stat-units-distributed">0</h3>
+              <span class="pill pill-trend" id="stat-units-trend" hidden></span>
+            </article>
+            <article class="card stat-card">
+              <p class="stat-label">Avg. Turnaround Time</p>
+              <h3 id="stat-avg-turnaround">-</h3>
+              <span class="stat-caption">/ Request</span>
+            </article>
+            <article class="card stat-card">
+              <p class="stat-label">Top Component Demand</p>
+              <h3 id="stat-top-component" class="stat-accent-text">-</h3>
+            </article>
+          </section>
+
+          <article class="card">
+            <div class="section-head">
+              <h3>Fulfillment History</h3>
+              <div class="head-actions">
+                <span class="input-wrap input-wrap-sm">
+                  <svg
+                    class="input-icon"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <circle cx="11" cy="11" r="8" />
+                    <path d="m21 21-4.3-4.3" />
+                  </svg>
+                  <input
+                    id="fulfilled-filter"
+                    type="text"
+                    placeholder="Search Request ID or City..."
+                  />
+                </span>
+                <button
+                  class="btn btn-outline btn-sm"
+                  id="fulfilled-filter-btn"
+                >
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3Z" />
+                  </svg>
+                  Filter
+                </button>
+              </div>
+            </div>
+            <p class="section-sub">
+              Review completed distributions to regional facilities.
+            </p>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Request ID</th>
+                    <th>Blood Group</th>
+                    <th>Component</th>
+                    <th>Fulfilled Units</th>
+                    <th>Destination City</th>
+                    <th>Status</th>
+                    <th>Fulfillment Date</th>
+                  </tr>
+                </thead>
+                <tbody id="fulfilled-body"></tbody>
+              </table>
+              <p class="empty-state" id="fulfilled-empty" hidden>
+                No fulfilled requests yet.
+              </p>
+            </div>
+            <div class="table-footer">
+              <p id="fulfilled-pagination-label" class="muted">
+                Showing 0-0 of 0 records
+              </p>
+              <div class="pager">
+                <button class="icon-btn-sm" id="fulfilled-prev" disabled>
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="m15 18-6-6 6-6" />
+                  </svg>
+                </button>
+                <button class="icon-btn-sm" id="fulfilled-next" disabled>
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="m9 18 6-6-6-6" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </article>
+        </section>
+      </div>
+    </div>
 
     <script type="module" src="./app.js"></script>
   </body>
