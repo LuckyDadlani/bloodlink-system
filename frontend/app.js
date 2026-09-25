@@ -1,4 +1,13 @@
-const API_BASE = (window.__ENV__ && window.__ENV__.API_BASE) || (window.location.protocol === "file:" || window.location.port !== "8080" ? "http://localhost:8080/api" : "/api");
+const API_BASE = (window.__ENV__ && window.__ENV__.API_BASE) || (
+  window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
+    ? "http://localhost:8080/api"
+    : (window.location.protocol === "http:" || window.location.protocol === "https:") &&
+      !window.location.hostname.endsWith(".netlify.app") &&
+      !window.location.hostname.endsWith(".onrender.com") &&
+      window.location.port !== "8080"
+      ? `${window.location.protocol}//${window.location.hostname}:8080/api`
+      : "/api"
+);
 const REFRESH_MS = 10000;
 const FULFILLED_PAGE_SIZE = 5;
 
