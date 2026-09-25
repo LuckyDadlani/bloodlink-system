@@ -1,6 +1,7 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from model import predict_donors, train_model
+import os
 
 app = Flask(__name__)
 CORS(app)
@@ -39,5 +40,6 @@ def retrain():
         return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
-    print("Starting BloodLink AI Prediction Service on port 8087...")
-    app.run(port=8087, debug=True)
+    port = int(os.environ.get('PORT', 8087))
+    print(f"Starting BloodLink AI Prediction Service on port {port}...")
+    app.run(host='0.0.0.0', port=port, debug=False)

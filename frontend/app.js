@@ -1,4 +1,4 @@
-const API_BASE = "http://localhost:8080/api";
+const API_BASE = (window.__ENV__ && window.__ENV__.API_BASE) || "/api";
 const REFRESH_MS = 10000;
 const FULFILLED_PAGE_SIZE = 5;
 
