@@ -66,16 +66,18 @@ public class RequestService {
             .replace("_NEG", "-");
         String dbComponentValue = normalizeComponentValue(request.componentRequired());
 
+        String rawUrgency = request.urgencyLevel();
+        String dbUrgency = "HIGH";
+        if (rawUrgency != null && rawUrgency.equalsIgnoreCase("CRITICAL")) {
+            dbUrgency = "CRITICAL";
+        }
+
         newRequest.setEmergencyId(emergencyId);
         newRequest.setHospitalId(request.creatorHospitalId());
         newRequest.setBloodGroupRequired(dbValue);
         newRequest.setComponentRequired(dbComponentValue);
         newRequest.setUnitsRequired(request.unitsRequired());
-        newRequest.setUrgencyLevel(
-            request.urgencyLevel() == null || request.urgencyLevel().isBlank()
-                ? "HIGH"
-                : request.urgencyLevel()
-        );
+        newRequest.setUrgencyLevel(dbUrgency);
         newRequest.setHospitalLatitude(hospital.getLatitude());
         newRequest.setHospitalLongitude(hospital.getLongitude());
         newRequest.setHospitalCity(hospital.getCity());
@@ -92,7 +94,6 @@ public class RequestService {
         int selected = topDonor == null ? 0 : 1;
 
         if (topDonor != null) {
-
             DonorNotification notification = new DonorNotification();
             notification.setNotificationId(UUID.randomUUID());
             notification.setEmergencyId(emergencyId);
@@ -108,14 +109,18 @@ public class RequestService {
             notification.setWasSelected(true);
 
             donorNotificationRepository.save(notification);
-
-            telegramService.sendMessage(
-                "🚨 Urgent Blood Requirement\n\n" +
-                "Blood Group: " + dbValue + "\n" +
-                "Blood Bank: " + hospital.getCity() + " Blood Bank\n\n" +
-                "If you are available, please call: 9329944373"
-            );
         }
+
+        // Always broadcast Telegram alert for emergency blood requirement
+        telegramService.sendMessage(
+            "🚨 URGENT BLOOD REQUIREMENT\n\n" +
+            "• Blood Group: " + dbValue + "\n" +
+            "• Component: " + dbComponentValue + "\n" +
+            "• Units Required: " + request.unitsRequired() + "\n" +
+            "• Urgency: " + dbUrgency + "\n" +
+            "• Hospital: " + (hospital.getHospitalName() != null ? hospital.getHospitalName() : "Hospital") + " (" + hospital.getCity() + ")\n\n" +
+            "If you can donate, please respond immediately or call: +91 9329944373"
+        );
 
         newRequest.setStatus(selected > 0 ? "DONORS_NOTIFIED" : "ESCALATED_TO_DONORS");
         newRequest.setDonorNotificationStartedAt(now);
