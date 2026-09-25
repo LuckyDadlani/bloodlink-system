@@ -1,4 +1,4 @@
-const API_BASE = (window.__ENV__ && window.__ENV__.API_BASE) || "/api";
+const API_BASE = (window.__ENV__ && window.__ENV__.API_BASE) || (window.location.protocol === "file:" || window.location.port !== "8080" ? "http://localhost:8080/api" : "/api");
 const REFRESH_MS = 10000;
 const FULFILLED_PAGE_SIZE = 5;
 
